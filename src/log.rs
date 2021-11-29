@@ -1,6 +1,8 @@
 use rand::prelude::{ThreadRng, thread_rng};
 use rand::distributions::Distribution;
 
+use serde::{Serialize, Deserialize};
+
 pub fn run(distr: &impl Distribution<f64>, alpha: f64) -> DemandManagement{
     let mut dm: DemandManagement = init(distr);
     for _i in 0..100{
@@ -46,9 +48,23 @@ fn init(distr: &impl Distribution<f64>) -> DemandManagement{
 
 pub struct DemandManagement {
     pub demands: Vec<f64>,
-    pub demands_estimated: Vec<f64>
+    pub demands_estimated: Vec<f64>,
+    
 }
 
-impl<> DemandManagement<> {
-    
+#[derive(Serialize, Deserialize)]
+pub struct Period{
+    ind: usize,
+    demand: f64,
+    demand_estimated: f64
+}
+
+impl DemandManagement {
+    pub fn to_periods(&self) -> Vec<Period> {
+        let d = &self.demands;
+        let e = &self.demands_estimated;
+        
+        let periods: Vec<Period> = d.into_iter().enumerate().zip(e.into_iter()).map(|((a,b), c)| Period { ind: a, demand: *b, demand_estimated: *c}).collect();
+        return periods;
+    }
 }
