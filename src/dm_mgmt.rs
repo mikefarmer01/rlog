@@ -19,13 +19,14 @@ pub struct Period {
 }
 
 impl<T: Distribution<f64>> DemandManagement<T> {
-    pub fn init(&mut self, distr: T, alpha: f32) {
-        self.demands = Vec::<f32>::new();
-        self.demands_estimated = Vec::<f32>::new();
-        self.distr = distr;
-        self.alpha = alpha;
-        self.rng = thread_rng();
-        self.period_zero();
+    pub fn new(distr: T, alpha: f32) -> DemandManagement<T>{
+        DemandManagement::<T> {
+            demands : Vec::<f32>::new(),
+            demands_estimated : Vec::<f32>::new(),
+            distr,
+            alpha,
+            rng : thread_rng(),
+        }
     }
     pub fn period_zero(&mut self) {
         self.make_demand();

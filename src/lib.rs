@@ -26,13 +26,7 @@ pub fn greet() {
 pub fn demand() -> JsValue {
     let normal_distr = Normal::new(30.0, 2.0).unwrap();
     let alpha = 0.1;
-    let mut dm: DemandManagement<Normal> = DemandManagement {
-        demands: Vec::<f32>::new(),
-        demands_estimated: Vec::<f32>::new(),
-        distr: normal_distr,
-        alpha: alpha,
-        rng: rand::prelude::thread_rng()
-    };
+    let mut dm: DemandManagement<Normal> = DemandManagement::new(normal_distr, alpha);
     //dm.init(normal_distr, alpha);
     
     let n = 50;
