@@ -1,9 +1,9 @@
-mod log;
+mod dm_mgmt;
 mod utils;
 
 use wasm_bindgen::prelude::*;
 
-use crate::log::DemandManagement;
+use crate::dm_mgmt::DemandManagement;
 use statrs::distribution::Normal;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
