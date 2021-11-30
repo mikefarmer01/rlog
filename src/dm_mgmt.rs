@@ -12,16 +12,16 @@ pub struct DemandManagement<T: Distribution<f64>> {
 
 #[derive(Serialize, Deserialize)]
 pub struct Period {
-    ind: i32,
-    demand: f32,
-    demand_estimated: f32
+    pub ind: i32,
+    pub demand: f32,
+    pub demand_estimated: f32
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct DemandData {
-    periods: Vec<Period>,
-    demands: Vec<f32>,
-    demands_estimated: Vec<f32>
+    pub periods: Vec<Period>,
+    pub demands: Vec<f32>,
+    pub demands_estimated: Vec<f32>
 }
 impl DemandData {
     pub fn to_periods(&mut self){
