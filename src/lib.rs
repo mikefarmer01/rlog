@@ -1,5 +1,6 @@
-mod dm_mgmt;
 mod utils;
+mod dm_mgmt;
+mod plotting;
 
 use wasm_bindgen::prelude::*;
 
@@ -33,5 +34,7 @@ pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
     dm.run_periods(n-1);
 
     let dd: DemandData = dm.demand_data;
+    let ds = dd.demands.clone();
+    plotting::plot(ds.into_iter().enumerate().map(|(a,b)| (a as i32, b)).collect());
     JsValue::from_serde(&dd).unwrap()
 }
