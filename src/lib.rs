@@ -1,12 +1,12 @@
 mod utils;
 mod dm_mgmt;
+mod dm_mgmt_normal;
 mod plotting;
 
 use wasm_bindgen::prelude::*;
 
-use crate::dm_mgmt::DemandManagement;
+use crate::dm_mgmt_normal::NormalDemandManagement;
 use dm_mgmt::DemandData;
-use statrs::distribution::Normal;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -26,9 +26,8 @@ pub fn greet() {
 
 #[wasm_bindgen]
 pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
-    let normal_distr = Normal::new(mean, std_dev).unwrap();
     let alpha = alpha;
-    let mut dm: DemandManagement<Normal> = DemandManagement::new(normal_distr, alpha);
+    let mut dm = NormalDemandManagement::new(mean, std_dev, alpha);
     
     dm.period_zero();
     dm.run_periods(n-1);
