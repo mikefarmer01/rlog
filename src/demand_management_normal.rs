@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use crate::dm_mgmt::DemandManagement;
+use crate::demand_management::DemandManagement;
 use statrs::distribution::Normal;
 
 #[wasm_bindgen]

@@ -1,12 +1,15 @@
 mod utils;
-mod dm_mgmt;
-mod dm_mgmt_normal;
+mod demand_data;
+mod demand_management;
+mod demand_management_normal;
+mod demand_generator;
+mod demand_predictor;
 mod plotting;
 
 use wasm_bindgen::prelude::*;
 
-use crate::dm_mgmt_normal::NormalDemandManagement;
-use dm_mgmt::DemandData;
+use crate::demand_management_normal::NormalDemandManagement;
+use demand_data::DemandData;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
