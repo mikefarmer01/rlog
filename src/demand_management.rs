@@ -18,22 +18,23 @@ impl<T: Distribution<f64>> DemandManagement<T> {
             demand_predictor: DemandPredictor::new(alpha),
         }
     }
-    pub fn period_zero(&mut self) {
+    fn period_zero(&mut self) {
         let demand = self.demand_generator.make_demand();
+        self.demand_data.periods.push(0);
         self.demand_data.demands.push(demand);
         self.demand_data.demands_estimated.push(demand);
     }
     pub fn run_periods(&mut self, n: i32) {
-        for _i in 0..n {
-            self.run_period();
+        self.period_zero();
+        for i in 1..n {
+            self.run_period(i);
         }
-        //Expend memory in order to take a different perspective on the demand data without needing to fiddle around with references/lifetimes/etc.
-        self.demand_data.to_periods();
     }
-    fn run_period(&mut self) {
+    fn run_period(&mut self, i: i32) {
         let last_demand_estimated = self.demand_data.demands_estimated.last().cloned().unwrap();
 
         let demand = self.demand_generator.make_demand();
+        self.demand_data.periods.push(i);
         self.demand_data.demands.push(demand);
 
         self.demand_data.demands_estimated.push(

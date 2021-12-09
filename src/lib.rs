@@ -7,9 +7,7 @@ mod demand_predictor;
 mod plotting;
 
 use wasm_bindgen::prelude::*;
-
 use crate::demand_management_normal::NormalDemandManagement;
-use demand_data::DemandData;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -18,25 +16,18 @@ use demand_data::DemandData;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, rlog!");
-}
-
-#[wasm_bindgen]
 pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
     let alpha = alpha;
     let mut dm = NormalDemandManagement::new(mean, std_dev, alpha);
     
-    dm.period_zero();
-    dm.run_periods(n-1);
+    dm.run_periods(n);
+    
+    let demand_data = dm.demand_data;
+    JsValue::from_serde(&demand_data).unwrap()
+}
 
-    let dd: DemandData = dm.demand_data;
-    let ds = dd.demands.clone();
-    plotting::plot(ds.into_iter().enumerate().map(|(a,b)| (a as i32, b)).collect());
-    JsValue::from_serde(&dd).unwrap()
+#[wasm_bindgen]
+pub fn plot(periods_demands: &JsValue) -> () {
+    let vec_periods_demands: Vec<f32> = periods_demands.into_serde().unwrap();
+    plotting::plot(&vec_periods_demands);
 }
