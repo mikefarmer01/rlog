@@ -5,6 +5,7 @@ mod demand_management_normal;
 mod demand_generator;
 mod demand_predictor;
 mod plotting;
+mod types;
 
 use wasm_bindgen::prelude::*;
 use crate::demand_management_normal::NormalDemandManagement;
@@ -14,6 +15,20 @@ use crate::demand_management_normal::NormalDemandManagement;
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "IDemandData")]
+    pub type DemandData;
+    fn alert(s: &str);
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
+#[wasm_bindgen(start)]
+pub fn main() {
+    utils::set_panic_hook();
+}
 
 #[wasm_bindgen]
 pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
@@ -27,7 +42,8 @@ pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
 }
 
 #[wasm_bindgen]
-pub fn plot(periods_demands: &JsValue) -> () {
-    let vec_periods_demands: Vec<f32> = periods_demands.into_serde().unwrap();
-    plotting::plot(&vec_periods_demands);
+pub fn plot(periods_demands: &JsValue, canvas_id: &JsValue) {
+    let vec_periods_demands: Vec<f32> = periods_demands.into_serde().expect("Invalid demand data.");
+    let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
+    plotting::plot(&str_canvas_id, &vec_periods_demands);
 }
