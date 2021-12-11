@@ -22,9 +22,10 @@ plotters = "0.3"
 plotters-canvas = "0.3"
 web-sys = { version = "0.3", features = [
     "Document",
-    "Element",
     "Window",
+    "Element",
     "HtmlCanvasElement",
+    "CssStyleDeclaration"
 ] }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by

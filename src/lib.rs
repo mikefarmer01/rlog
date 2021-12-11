@@ -7,6 +7,7 @@ mod demand_predictor;
 mod plotting;
 mod types;
 
+use utils::to_rgb;
 use wasm_bindgen::prelude::*;
 use crate::demand_management_normal::NormalDemandManagement;
 
@@ -42,8 +43,15 @@ pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
 }
 
 #[wasm_bindgen]
-pub fn plot(periods_demands: &JsValue, canvas_id: &JsValue) {
+pub fn plot(periods_demands: &JsValue, canvas_id: &JsValue, line_color: &JsValue) {
     let vec_periods_demands: Vec<f32> = periods_demands.into_serde().expect("Invalid demand data.");
     let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
-    plotting::plot(&str_canvas_id, &vec_periods_demands);
+    let color = to_rgb(line_color.into_serde().expect("Invalid color."));
+    plotting::plot(&str_canvas_id, &vec_periods_demands, color);
+}
+
+#[wasm_bindgen]
+pub fn clear(canvas_id: &JsValue) {
+    let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
+    plotting::clear(&str_canvas_id);
 }
