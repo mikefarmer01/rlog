@@ -43,6 +43,14 @@ pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
 }
 
 #[wasm_bindgen]
+pub fn resmooth(alpha: f32, demands: &JsValue) -> JsValue {
+    let vec_demands = demands.into_serde().expect("Invalid demands data.");
+    let mut dm = NormalDemandManagement::load(alpha, vec_demands);
+    let demand_data = dm.smooth();
+    JsValue::from_serde(demand_data).unwrap()
+}
+
+#[wasm_bindgen]
 pub fn plot(periods_demands: &JsValue, canvas_id: &JsValue, line_color: &JsValue) {
     let vec_periods_demands: Vec<f32> = periods_demands.into_serde().expect("Invalid demand data.");
     let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
