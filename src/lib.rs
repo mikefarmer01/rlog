@@ -1,8 +1,8 @@
 mod demand_management;
+mod error;
 mod plotting;
 mod types;
 mod utils;
-mod error;
 
 use demand_management::demand_management_normal::NormalDemandManagement;
 use error::canvas_clear_error::CanvasClearError;
@@ -31,8 +31,10 @@ pub fn main() {
 
 #[wasm_bindgen]
 pub async fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> Result<JsValue, JsError> {
-    let alpha = alpha;
-    let mut dm = NormalDemandManagement::new(mean, std_dev, alpha);
+    if mean.is_nan() || std_dev.is_nan() || alpha.is_nan() {
+        return Err(JsError::new("One or more of the demand parameters is invalid: NAN"));
+    };
+    let mut dm = NormalDemandManagement::new(mean, std_dev, alpha)?;
 
     dm.run_periods(n);
 
@@ -44,7 +46,10 @@ pub async fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> Result<JsVal
 #[wasm_bindgen]
 pub async fn resmooth(alpha: f32, demands: JsValue) -> Result<JsValue, JsError> {
     let vec_demands = demands.into_serde()?;
-    let mut dm = NormalDemandManagement::load(alpha, vec_demands);
+    if alpha.is_nan() {
+        return Err(JsError::new("Invalid alpha: NAN"));
+    };
+    let mut dm = NormalDemandManagement::load(alpha, vec_demands)?;
 
     let demand_data = dm.smooth();
     let js_demand_data = JsValue::from_serde(demand_data)?;
@@ -52,7 +57,11 @@ pub async fn resmooth(alpha: f32, demands: JsValue) -> Result<JsValue, JsError> 
 }
 
 #[wasm_bindgen]
-pub async fn plot(periods_demands: JsValue, canvas_id: JsValue, line_color: JsValue) -> Result<(), JsError>{
+pub async fn plot(
+    periods_demands: JsValue,
+    canvas_id: JsValue,
+    line_color: JsValue,
+) -> Result<(), JsError> {
     let vec_periods_demands: Vec<f32> = periods_demands.into_serde().expect("Invalid demand data.");
     let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
     let color = to_rgb(line_color.into_serde().expect("Invalid color."));
@@ -62,11 +71,11 @@ pub async fn plot(periods_demands: JsValue, canvas_id: JsValue, line_color: JsVa
 }
 
 #[wasm_bindgen]
-pub async fn clear(canvas_id: JsValue) -> Result<(), JsError>{
+pub async fn clear(canvas_id: JsValue) -> Result<(), JsError> {
     let str_canvas_id: Result<String, serde_json::Error> = canvas_id.into_serde();
     let str_canvas_id = match str_canvas_id {
         Ok(str) => Ok(str),
-        Err(_) => Err(CanvasClearError::SerdeError)
+        Err(_) => Err(CanvasClearError::SerdeError),
     };
     let str_canvas_id = str_canvas_id?;
     plotting::clear(&str_canvas_id)?;
