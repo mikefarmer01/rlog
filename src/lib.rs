@@ -1,15 +1,13 @@
-mod utils;
-mod demand_data;
 mod demand_management;
-mod demand_management_normal;
-mod demand_generator;
-mod demand_predictor;
 mod plotting;
 mod types;
+mod utils;
+mod error;
 
+use demand_management::demand_management_normal::NormalDemandManagement;
+use error::canvas_clear_error::CanvasClearError;
 use utils::to_rgb;
 use wasm_bindgen::prelude::*;
-use crate::demand_management_normal::NormalDemandManagement;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -32,34 +30,45 @@ pub fn main() {
 }
 
 #[wasm_bindgen]
-pub fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> JsValue{
+pub async fn smooth(mean: f64, std_dev: f64, alpha: f32, n: i32) -> Result<JsValue, JsError> {
     let alpha = alpha;
     let mut dm = NormalDemandManagement::new(mean, std_dev, alpha);
-    
+
     dm.run_periods(n);
-    
+
     let demand_data = dm.demand_data;
-    JsValue::from_serde(&demand_data).unwrap()
+    let js_demand_data = JsValue::from_serde(&demand_data)?;
+    Ok(js_demand_data)
 }
 
 #[wasm_bindgen]
-pub fn resmooth(alpha: f32, demands: &JsValue) -> JsValue {
-    let vec_demands = demands.into_serde().expect("Invalid demands data.");
+pub async fn resmooth(alpha: f32, demands: JsValue) -> Result<JsValue, JsError> {
+    let vec_demands = demands.into_serde()?;
     let mut dm = NormalDemandManagement::load(alpha, vec_demands);
+
     let demand_data = dm.smooth();
-    JsValue::from_serde(demand_data).unwrap()
+    let js_demand_data = JsValue::from_serde(demand_data)?;
+    Ok(js_demand_data)
 }
 
 #[wasm_bindgen]
-pub fn plot(periods_demands: &JsValue, canvas_id: &JsValue, line_color: &JsValue) {
+pub async fn plot(periods_demands: JsValue, canvas_id: JsValue, line_color: JsValue) -> Result<(), JsError>{
     let vec_periods_demands: Vec<f32> = periods_demands.into_serde().expect("Invalid demand data.");
     let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
     let color = to_rgb(line_color.into_serde().expect("Invalid color."));
-    plotting::plot(&str_canvas_id, &vec_periods_demands, color);
+
+    plotting::plot(&str_canvas_id, &vec_periods_demands, color)?;
+    Ok(())
 }
 
 #[wasm_bindgen]
-pub fn clear(canvas_id: &JsValue) {
-    let str_canvas_id: String = canvas_id.into_serde().expect("Invalid canvas id.");
-    plotting::clear(&str_canvas_id);
+pub async fn clear(canvas_id: JsValue) -> Result<(), JsError>{
+    let str_canvas_id: Result<String, serde_json::Error> = canvas_id.into_serde();
+    let str_canvas_id = match str_canvas_id {
+        Ok(str) => Ok(str),
+        Err(_) => Err(CanvasClearError::SerdeError)
+    };
+    let str_canvas_id = str_canvas_id?;
+    plotting::clear(&str_canvas_id)?;
+    Ok(())
 }

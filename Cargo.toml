@@ -11,22 +11,30 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 js = []
 
+
+[patch.crates-io]
+wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen", rev = "ac87c8215bdd28d6aa0e12705996238a78227f8c" }
+#wasm-bindgen = { path = "/home/michael/repos/wasm-bindgen" }
+
 [dependencies]
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
-rand = "0.8"
-getrandom = { version = "0.2", features = ["js"] }
-num = "0.4"
+wasm-bindgen = { version = "0.2.78", features = ["serde-serialize"] }
+wasm-bindgen-futures = "0.4"
+rand = "0.8.4"
+getrandom = { version = "0.2.3", features = ["js"] }
+num = "0.4.0"
 statrs = "0.15.0"
-serde = { version = "1.0", features = ["derive"] }
-plotters = "0.3"
-plotters-canvas = "0.3"
-web-sys = { version = "0.3", features = [
+serde = { version = "1.0.131", features = ["derive"] }
+serde_json = "1.0"
+plotters = "0.3.1"
+plotters-canvas = "0.3.0"
+web-sys = { version = "0.3.55", features = [
     "Document",
     "Window",
     "Element",
     "HtmlCanvasElement",
-    "CssStyleDeclaration"
+    "CssStyleDeclaration",
 ] }
+
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

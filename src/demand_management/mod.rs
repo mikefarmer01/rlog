@@ -1,8 +1,13 @@
+mod demand_data;
+mod demand_generator;
+pub mod demand_management_normal;
+mod demand_predictor;
+
 use statrs::statistics::Distribution;
 
-use crate::demand_data::DemandData;
-use crate::demand_generator::DemandGenerator;
-use crate::demand_predictor::DemandPredictor;
+use demand_data::DemandData;
+use demand_generator::DemandGenerator;
+use demand_predictor::DemandPredictor;
 
 pub struct DemandManagement<T: Distribution<f64>> {
     pub demand_data: DemandData,
